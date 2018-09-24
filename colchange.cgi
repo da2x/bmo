@@ -136,12 +136,26 @@ if (defined $cgi->param('rememberedquery')) {
     $params->param('columnlist', join(",", @collist));
     $vars->{'redirect_url'} = "buglist.cgi?".$params->query_string();
 
+
     # If we're running on Microsoft IIS, $cgi->redirect discards
     # the Set-Cookie lines. In mod_perl, $cgi->redirect with cookies
     # causes the page to be rendered as text/plain.
     # Workaround is to use the old-fashioned  redirection mechanism.
     # See bug 214466 and bug 376044 for details.
-    print $cgi->redirect($vars->{'redirect_url'});
+    if ($ENV{'MOD_PERL'}
+        || $ENV{'SERVER_SOFTWARE'} =~ /Microsoft-IIS/
+        || $ENV{'SERVER_SOFTWARE'} =~ /Sun ONE Web/)
+    {
+      print $cgi->header(-type => "text/html",
+                         -refresh => "0; URL=$vars->{'redirect_url'}");
+    }
+    else {
+      print $cgi->redirect($vars->{'redirect_url'});
+      exit;
+    }
+
+    $template->process("global/message.html.tmpl", $vars)
+      || ThrowTemplateError($template->error());
     exit;
 }
 

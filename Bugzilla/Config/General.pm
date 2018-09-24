@@ -40,6 +40,12 @@ use constant get_param_list => (
     },
 
     {
+        name    => 'shutdownhtml',
+        type    => 'l',
+        default => ''
+    },
+
+    {
         name    => 'announcehtml',
         type    => 'l',
         default => ''

@@ -35,13 +35,17 @@ sub compile_file {
     my ($file) = @_;
 
     # Don't allow CPAN.pm to modify the global @INC, which the version
-    # shipped with Perl 5.8.8 does. (It gets loaded by
+    # shipped with Perl 5.8.8 does. (It gets loaded by 
     # Bugzilla::Install::CPAN.)
     local @INC = @INC;
 
     if ($file =~ /extensions/) {
         skip "$file: extensions not tested",  1;
         return;
+    }
+    if ($file =~ /ModPerl/) {
+       skip "$file: ModPerl stuff not tested", 1;
+       return;
     }
 
     if ($file =~ s/\.pm$//) {
@@ -78,7 +82,7 @@ my $file_features = map_files_to_features();
 # Test the scripts by compiling them
 foreach my $file (@testitems) {
     # These were already compiled, above.
-    next if ($file eq 'Bugzilla.pm'
+    next if ($file eq 'Bugzilla.pm' 
              or $file eq 'Bugzilla/Constants.pm'
              or $file eq 'Bugzilla/Install/Requirements.pm');
     SKIP: {
@@ -90,10 +94,10 @@ foreach my $file (@testitems) {
             skip "$file: $feature not enabled", 1;
         }
 
-        # Check that we have a DBI module to support the DB, if this
+        # Check that we have a DBI module to support the DB, if this 
         # is a database module (but not Schema)
         if ($file =~ m{Bugzilla/DB/([^/]+)\.pm$}
-            and $file ne "Bugzilla/DB/Schema.pm")
+            and $file ne "Bugzilla/DB/Schema.pm") 
         {
             my $module = lc($1);
             Bugzilla->feature($module) or skip "$file: Driver for $module not installed", 1;
@@ -101,4 +105,4 @@ foreach my $file (@testitems) {
 
         compile_file($file);
     }
-}
+}      
